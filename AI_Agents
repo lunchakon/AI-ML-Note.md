@@ -1,0 +1,42 @@
+
+*** Smart Budget & Expense + Financial Assistant 
+*** Expense Ingestion
+*** Upload CSVs, bank statements, or receipts (OCR)
+
+Manual entry through UI
+Categorization
+Auto-categorize expenses (e.g., Food, Bills, Travel)
+Editable by user
+Dashboard Summary
+Monthly spend
+Top categories
+Comparison to previous months
+
+Natural Language Queries
+"How much did I spend on food last week?"
+"What are my top 3 expenses this month?"
+Savings & Budget Goals
+Set monthly budgets per category
+Get alerts when nearing limits
+
+
+
+
+
+
+---------------------------------------------------
+smart-finance-assistant/
+│
+├── app/
+│   ├── main.py          # Streamlit or FastAPI app
+│   ├── expense_utils.py # CSV parsing, categorization
+│   ├── budget_logic.py  # Budgeting logic
+│   ├── ocr.py           # For receipts
+│   └── query_agent.py   # Natural language query interface
+│
+├── data/
+│   ├── user_expenses.csv
+│   └── receipts/
+│
+├── requirements.txt
+└── README.md
