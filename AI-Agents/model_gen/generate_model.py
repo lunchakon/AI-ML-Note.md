@@ -1,42 +1,33 @@
-import os
+# model_gen/generate_model.py
+
 import sys
-from datetime import datetime
+import torch
+from transformers import TripoSRPipeline
+from pathlib import Path
 
-OUTPUT_DIR = "./shared/output"
+def generate(prompt: str, output_path: str = "output/result.stl"):
+    print(f"Generating model for prompt: '{prompt}'")
 
-def generate_dummy_stl(prompt, output_path):
-    # This is a placeholder. Replace with AI model inference.
-    stl_content = f"""solid TESTING {prompt}
-  facet normal 0 0 0
-    outer loop
-      vertex 0 0 0
-      vertex 1 0 0
-      vertex 0 1 0
-    endloop
-  endfacet
-endsolid {prompt}
-"""
-    with open(output_path, "w") as f:
-        f.write(stl_content)
+    # Load pipeline
+    pipe = TripoSRPipeline.from_pretrained(
+        "stabilityai/TripoSR",
+        torch_dtype=torch.float16,
+        variant="fp16"
+    ).to("cuda" if torch.cuda.is_available() else "cpu")
 
-def main():
-    # Get prompt from command line or environment
-    prompt = os.environ.get("PROMPT")
-    if not prompt and len(sys.argv) > 1:
-        prompt = sys.argv[1]
-    if not prompt:
-        print("No prompt provided.")
-        sys.exit(1)
+    # Generate the mesh
+    result = pipe(prompt)
+    mesh = result.meshes[0]
 
-    # Create output directory if it doesn't exist
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{prompt.replace(' ', '_')}_{timestamp}.stl"
-    output_path = os.path.join(OUTPUT_DIR, filename)
+    # Save the output
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    mesh.export(str(output_path))
 
-    print(f"Generating STL for prompt: {prompt}")
-    generate_dummy_stl(prompt, output_path)
-    print(f"Saved: {output_path}")
+    print(f"✅ Model saved to: {output_path}")
+    return output_path
 
 if __name__ == "__main__":
-    main()
+    # Get prompt from CLI arg or use default
+    user_prompt = sys.argv[1] if len(sys.argv) > 1 else "A spiral vase"
+    generate(user_prompt)

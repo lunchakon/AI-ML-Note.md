@@ -19,3 +19,9 @@ AI-AGENTS/
 ├── shared/
 │   └── output/                # Shared folder for generated files
 └── README.md
+
+Your architecture matches your requirements.
+- n8n handles workflow automation.
+- Model generation and Blender cleanup are containerized and share output.
+- Streamlit UI is optional and functional.
+- Shared volume is correctly set up for .stl files.

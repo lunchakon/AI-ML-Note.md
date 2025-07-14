@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "3d-model",
+        "method": "POST",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Receive Prompt",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "3d-model"
+    },
+    {
+      "parameters": {
+        "command": "docker exec ai-prompt-to-3d-model_gen-1 python generate_model.py \"={{$json[\"prompt\"]}}\""
+      },
+      "id": "2",
+      "name": "Generate Model",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{ json: { message: `Model generated for prompt: ${$json.prompt}` } }];"
+      },
+      "id": "3",
+      "name": "Prepare Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 300]
+    }
+  ],
+  "connections": {
+    "Receive Prompt": {
+      "main": [["Generate Model"]]
+    },
+    "Generate Model": {
+      "main": [["Prepare Response"]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "name": "Prompt to 3D Model",
+  "version": 1
+}
