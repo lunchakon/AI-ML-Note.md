@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "const links = items.map(item => item.json.link);\nreturn links.map(link => ({ json: { link } }));"
+      },
+      "name": "Extract Links",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "videoId": "={{$json[\"link\"].split(\"v=\")[1]}}",
+        "additionalFields": {
+          "part": "snippet,contentDetails"
+        }
+      },
+      "name": "YouTube API",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const summaries = items.map(item => {\n  const title = item.json.snippet.title;\n  const description = item.json.snippet.description;\n  return { summary: `${title}: ${description}` };\n});\nreturn summaries.map(summary => ({ json: summary }));"
+      },
+      "name": "Summarize Video",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{$json[\"summary\"]}}"
+      },
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Extract Links": {
+      "main": [
+        [
+          {
+            "node": "YouTube API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube API": {
+      "main": [
+        [
+          {
+            "node": "Summarize Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Video": {
+      "main": [
+        [
+          {
+            "node": "Send to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
