@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - 5678:5678
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=123456789
+    volumes:
+      - ./n8n/data:/home/node/.n8n
+      - ./shared/output:/data/output  # shared folder
+    restart: always
+
+  model_gen:
+    build: ./model_gen
+    volumes:
+      - ./shared/output:/app/output
+    restart: unless-stopped
+
+  blender:
+    build: ./blender
+    volumes:
+      - ./shared/output:/app/output
+    restart: unless-stopped
+
+  streamlit:
+    build: ./ui
+    ports:
+      - 8501:8501
+    volumes:
+      - ./shared/output:/app/output
+    restart: unless-stopped
